@@ -17,14 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - your-module-1
-          - your-module-2
+          - ollama
 
     env:
       PGHOST: pg_db
       PGPORT: 5432
       PGUSER: postgres
       PGPASSWORD: password
+      OLLAMA_HOST: http://ollama:11434
 
     services:
       pg_db:
@@ -53,6 +53,11 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
+      ollama:
+        image: ollama/ollama:latest
+        ports:
+          - 11434:11434
 
     steps:
       - name: Configure Git (for tests)
@@ -88,6 +93,23 @@ jobs:
           pgpm admin-users bootstrap --yes
           # optional, but added to avoid concurrent attempts to add user
           pgpm admin-users add --test --yes
+
+      - name: Wait for Ollama and pull models
+        run: |
+          echo "Waiting for Ollama to be ready..."
+          for i in $(seq 1 30); do
+            if wget -q -O - http://ollama:11434/api/tags > /dev/null 2>&1; then
+              echo "Ollama is ready!"
+              break
+            fi
+            echo "Waiting for Ollama... ($i/30)"
+            sleep 2
+          done
+          echo "Pulling nomic-embed-text model (for embeddings)..."
+          wget -q -O - --post-data='{"name": "nomic-embed-text"}' --header='Content-Type: application/json' http://ollama:11434/api/pull
+          echo ""
+          echo "Pulling mistral model (for RAG response generation)..."
+          wget -q -O - --post-data='{"name": "mistral"}' --header='Content-Type: application/json' http://ollama:11434/api/pull
 
       - name: Test ${{ matrix.package }}
         run: cd ./packages/${{ matrix.package }} && pnpm test
