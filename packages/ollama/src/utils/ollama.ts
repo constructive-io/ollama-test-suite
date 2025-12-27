@@ -14,8 +14,8 @@ interface OllamaEmbeddingResponse {
 export class OllamaClient {
   private baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:11434') {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    this.baseUrl = baseUrl || process.env.OLLAMA_HOST || 'http://localhost:11434';
   }
 
   async generateEmbedding(text: string): Promise<number[]> {

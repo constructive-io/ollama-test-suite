@@ -1,5 +1,5 @@
 process.env.LOG_SCOPE = 'ollama';
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 import { getConnections,PgTestClient } from 'pgsql-test';
 
@@ -8,39 +8,18 @@ import { OllamaClient } from '../src/utils/ollama';
 let pg: PgTestClient;
 let teardown: () => Promise<void>;
 let ollama: OllamaClient;
-let ollamaAvailable = false;
 
 const formatVector = (embedding: number[]): string => `[${embedding.join(',')}]`;
-
-const checkOllamaAvailable = async (): Promise<boolean> => {
-  try {
-    const response = await fetch('http://localhost:11434/api/tags', {
-      method: 'GET',
-      signal: AbortSignal.timeout(5000),
-    });
-    return response.ok;
-  } catch {
-    return false;
-  }
-};
 
 beforeAll(async () => {
   ({ pg, teardown } = await getConnections());
   ollama = new OllamaClient();
-  ollamaAvailable = await checkOllamaAvailable();
-  if (!ollamaAvailable) {
-    console.log('Ollama is not available, skipping tests that require it');
-  }
 });
 
 afterAll(() => teardown());
 
 describe('Vector Search with Document Chunks', () => {
   it('should chunk, embed, and retrieve semantically relevant content', async () => {
-    if (!ollamaAvailable) {
-      console.log('Skipping test: Ollama is not available');
-      return;
-    }
     const longDocument = `
       Machine Learning Basics:
       Machine learning is a subset of artificial intelligence that enables systems to learn from data.
