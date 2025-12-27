@@ -17,8 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - your-module-1
-          - your-module-2
+          - ollama
 
     env:
       PGHOST: pg_db
