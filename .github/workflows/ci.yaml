@@ -97,8 +97,8 @@ jobs:
       - name: Wait for Ollama and pull model
         run: |
           echo "Waiting for Ollama to be ready..."
-          for i in {1..30}; do
-            if curl -s http://ollama:11434/api/tags > /dev/null 2>&1; then
+          for i in $(seq 1 30); do
+            if wget -q -O - http://ollama:11434/api/tags > /dev/null 2>&1; then
               echo "Ollama is ready!"
               break
             fi
@@ -106,7 +106,7 @@ jobs:
             sleep 2
           done
           echo "Pulling mistral model..."
-          curl -X POST http://ollama:11434/api/pull -d '{"name": "mistral"}'
+          wget -q -O - --post-data='{"name": "mistral"}' --header='Content-Type: application/json' http://ollama:11434/api/pull
 
       - name: Test ${{ matrix.package }}
         run: cd ./packages/${{ matrix.package }} && pnpm test
