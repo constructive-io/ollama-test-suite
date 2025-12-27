@@ -1,4 +1,4 @@
 %syntax-version=1.0.0
 %project=ollama
 %uri=ollama
-migration 2025-12-27T07:17:00Z Devin <devin@constructive.io> # adding migration for intelligence schema
+migration 2025-12-27T07:17:00Z Constructive <developers@constructive.io> # adding migration for intelligence schema
