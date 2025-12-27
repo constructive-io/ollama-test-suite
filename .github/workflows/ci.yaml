@@ -94,7 +94,7 @@ jobs:
           # optional, but added to avoid concurrent attempts to add user
           pgpm admin-users add --test --yes
 
-      - name: Wait for Ollama and pull model
+      - name: Wait for Ollama and pull models
         run: |
           echo "Waiting for Ollama to be ready..."
           for i in $(seq 1 30); do
@@ -105,7 +105,10 @@ jobs:
             echo "Waiting for Ollama... ($i/30)"
             sleep 2
           done
-          echo "Pulling mistral model..."
+          echo "Pulling nomic-embed-text model (for embeddings)..."
+          wget -q -O - --post-data='{"name": "nomic-embed-text"}' --header='Content-Type: application/json' http://ollama:11434/api/pull
+          echo ""
+          echo "Pulling mistral model (for RAG response generation)..."
           wget -q -O - --post-data='{"name": "mistral"}' --header='Content-Type: application/json' http://ollama:11434/api/pull
 
       - name: Test ${{ matrix.package }}

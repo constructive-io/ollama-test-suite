@@ -1,5 +1,5 @@
 process.env.LOG_SCOPE = 'ollama';
-jest.setTimeout(120000);
+jest.setTimeout(300000);
 
 import { getConnections,PgTestClient } from 'pgsql-test';
 

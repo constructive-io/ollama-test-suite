@@ -18,14 +18,14 @@ export class OllamaClient {
     this.baseUrl = baseUrl || process.env.OLLAMA_HOST || 'http://localhost:11434';
   }
 
-  async generateEmbedding(text: string): Promise<number[]> {
+  async generateEmbedding(text: string, model: string = 'nomic-embed-text'): Promise<number[]> {
     const response = await fetch(`${this.baseUrl}/api/embeddings`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistral',
+        model,
         prompt: text,
       }),
     });

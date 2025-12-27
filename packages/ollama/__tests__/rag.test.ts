@@ -1,5 +1,5 @@
 process.env.LOG_SCOPE = 'ollama';
-jest.setTimeout(120000);
+jest.setTimeout(300000);
 
 import fetch from 'cross-fetch';
 import { getConnections,PgTestClient } from 'pgsql-test';
@@ -134,10 +134,11 @@ describe('Retrieval Augmented Generation (RAG)', () => {
       .map(row => row.content)
       .join('\n\n');
 
+    const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434';
     const response = await measureTime(
       'ollama',
       'generate (RAG response)',
-      () => fetch('http://localhost:11434/api/generate', {
+      () => fetch(`${ollamaHost}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

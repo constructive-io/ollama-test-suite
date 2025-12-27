@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS intelligence.documents (
     title TEXT,
     content TEXT NOT NULL,
     metadata JSONB DEFAULT '{}'::jsonb,
-    embedding VECTOR(4096),
+    embedding VECTOR(768),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS intelligence.chunks (
     id SERIAL PRIMARY KEY,
     document_id INTEGER NOT NULL REFERENCES intelligence.documents(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
-    embedding VECTOR(4096),
+    embedding VECTOR(768),
     chunk_index INTEGER NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -64,7 +64,7 @@ $$ LANGUAGE plpgsql;
 
 -- Similarity search using pgvector
 CREATE OR REPLACE FUNCTION intelligence.find_similar_chunks(
-    p_embedding VECTOR(4096),
+    p_embedding VECTOR(768),
     p_limit INTEGER DEFAULT 5,
     p_similarity_threshold FLOAT DEFAULT 0.7
 )
