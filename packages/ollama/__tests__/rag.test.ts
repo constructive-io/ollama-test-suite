@@ -9,8 +9,21 @@ import { OllamaClient } from '../src/utils/ollama';
 let pg: PgTestClient;
 let teardown: () => Promise<void>;
 let ollama: OllamaClient;
+let ollamaAvailable = false;
 
 const formatVector = (embedding: number[]): string => `[${embedding.join(',')}]`;
+
+const checkOllamaAvailable = async (): Promise<boolean> => {
+  try {
+    const response = await fetch('http://localhost:11434/api/tags', {
+      method: 'GET',
+      signal: AbortSignal.timeout(5000),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
 
 const logs: string[] = [];
 const addLog = (service: string, action: string, duration: number) => {
@@ -32,12 +45,20 @@ const addSummary = (title: string, value: string) => {
 beforeAll(async () => {
   ({ pg, teardown } = await getConnections());
   ollama = new OllamaClient();
+  ollamaAvailable = await checkOllamaAvailable();
+  if (!ollamaAvailable) {
+    console.log('Ollama is not available, skipping tests that require it');
+  }
 });
 
 afterAll(() => teardown());
 
 describe('Retrieval Augmented Generation (RAG)', () => {
   it('should generate a response using retrieved context', async () => {
+    if (!ollamaAvailable) {
+      console.log('Skipping test: Ollama is not available');
+      return;
+    }
     const longDocument = `
       Interchain JavaScript Stack Overview:
       The Interchain JavaScript Stack (InterchainJS) enables developers to build cross-chain applications using familiar TypeScript tooling.
