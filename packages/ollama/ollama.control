@@ -1,0 +1,7 @@
+# ollama extension
+comment = 'ollama extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/ollama'
+requires = 'uuid-ossp,vector'
+relocatable = false
+superuser = false
