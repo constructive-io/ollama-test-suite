@@ -11,15 +11,32 @@
    <a href="https://www.npmjs.com/package/ollama"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/ollama-test-suite?filename=packages%2Follama%2Fpackage.json"/></a>
 </p>
 
-## Developing
+A PostgreSQL module for RAG (Retrieval-Augmented Generation) with Ollama and pgvector. Provides document storage, automatic chunking, vector embeddings, and semantic similarity search.
 
-This module was generated with `pgpm init`. For a complete guide on creating and testing database modules, see [Creating Your First Module](https://constructive.io/learn/modular-postgres/creating-first-module).
+## Features
+
+- **Document Storage**: Store documents with metadata and vector embeddings
+- **Automatic Chunking**: Split documents into overlapping chunks for better retrieval
+- **Vector Search**: Find semantically similar content using pgvector's cosine distance
+- **RAG Service**: Complete TypeScript service for document ingestion and querying
+- **Ollama Client**: API client supporting embeddings and text generation (sync/streaming)
+
+## Schema
+
+The module creates an `intelligence` schema with:
+
+- `documents` - Full documents with title, content, metadata, and embedding
+- `chunks` - Document chunks with embeddings for granular retrieval
+- `find_similar_chunks()` - Function for semantic similarity search
+- `create_document_chunks()` - Function for automatic document chunking
+
+## Developing
 
 ```sh
 # Install dependencies
 pnpm install
 
-# Run tests
+# Run tests (requires Ollama running with nomic-embed-text and mistral models)
 pnpm test
 
 # Run tests in watch mode
@@ -27,6 +44,22 @@ pnpm test:watch
 
 # Deploy to a database
 pgpm deploy --database your_db --createdb --yes
+```
+
+## Exports
+
+```typescript
+import { OllamaClient, RAGService } from 'ollama';
+
+// Low-level Ollama API client
+const ollama = new OllamaClient();
+const embedding = await ollama.generateEmbedding('text');
+const response = await ollama.generateResponse('prompt', 'context');
+
+// High-level RAG service
+const rag = new RAGService(pool);
+await rag.addDocument('title', 'content');
+const answer = await rag.query('question', 'session-id');
 ```
 
 ## Credits
