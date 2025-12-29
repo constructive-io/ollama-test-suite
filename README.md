@@ -12,6 +12,24 @@
 
 A reference implementation demonstrating Ollama integration with PostgreSQL and pgvector for building Retrieval-Augmented Generation (RAG) pipelines. This project showcases how to combine local LLMs with vector databases for semantic search and AI-powered document retrieval.
 
+```mermaid
+flowchart LR
+    subgraph Ingestion
+        A[Document] --> B[Chunking]
+        B --> C[Ollama Embedding]
+        C --> D[(pgvector)]
+    end
+    
+    subgraph Query
+        E[User Question] --> F[Ollama Embedding]
+        F --> G[Similarity Search]
+        D --> G
+        G --> H[Context Retrieval]
+        H --> I[Ollama LLM]
+        I --> J[Response]
+    end
+```
+
 ## What's Included
 
 This test suite demonstrates a complete RAG pipeline with the following components:
